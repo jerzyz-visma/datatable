@@ -4,16 +4,16 @@
       <thead>
       <tr>
         <ThCell
-          v-for="(col, colIndex) in cols"
-          :key="col.id"
-          :id="col.id"
-          :type="col.type"
-          :freeze="col.freeze"
-          :align="col.align"
+          v-for="th in datatableHead"
+          :key="th.value"
+          :id="th.id"
+          :type="th.type"
+          :freeze="th.freeze"
+          :align="th.align"
           @freeze="freezeColumn"
           @resize="initResize"
         >
-          {{ col.title }}
+          {{ th.title }}
         </ThCell>
       </tr>
       </thead>
@@ -53,6 +53,40 @@ interface Columns {
   freeze?: boolean,
   align?: string
 }
+
+interface DatatableRow {
+
+}
+
+interface DatatableRowColumns {
+  id: number | string,
+  account: string
+  name: string,
+  email: string,
+  address: {
+    city: string,
+    country: string
+  },
+  position: string
+}
+
+interface DatatableTh {
+  id: number,
+  value: string,
+  title: string,
+  type: string,
+  freeze?: boolean,
+  align?: string
+}
+
+const datatableHead = ref<DatatableTh[]>([
+  { id: 0, value: 'id', title: 'Id', type: 'numeric', align: 'left', freeze: true, },
+  { id: 1, value: 'account', title: 'Account', type: 'text-short', align: 'left', freeze: false, },
+  { id: 2, value: 'name', title: 'Name', type: 'text-short', align: 'left', freeze: false, },
+  { id: 3, value: 'city', title: 'City', type: 'text-short', align: 'left', freeze: false, },
+  { id: 4, value: 'country', title: 'Country', type: 'text-short', align: 'left', freeze: false, },
+  { id: 5, value: 'position', title: 'Position', type: 'text-short', align: 'left', freeze: false, },
+])
 
 interface IColumnSize {
   th: HTMLElement,
