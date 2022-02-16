@@ -10,6 +10,7 @@
           :type="th.type"
           :freeze="th.freeze"
           :align="th.align"
+          :class="{ 'hidden': th.hidden }"
           @freeze="freezeColumn"
           @resize="initResize"
         >
@@ -25,6 +26,7 @@
           :id="col.id"
           :type="col.type"
           :freeze="col.freeze"
+          :class="{ 'hidden': col.hidden }"
           :align="col.align"
         >{{ col.value }}</TdCell>
       </tr>
@@ -34,7 +36,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUpdated, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import ThCell from "../components/ThCell.vue";
 import TdCell from "../components/TdCell.vue";
 
@@ -43,19 +45,6 @@ const columnTypeToRatioMap: Record<string, number> = {
   "numeric": 1,
   "text-short": 1.67,
   "text-long": 3.33,
-}
-
-interface Columns {
-  id: number,
-  title: string,
-  value: string,
-  type: string,
-  freeze?: boolean,
-  align?: string
-}
-
-interface DatatableRow {
-
 }
 
 interface DatatableRowColumns {
@@ -70,17 +59,18 @@ interface DatatableRowColumns {
   position: string
 }
 
-interface DatatableTh {
+interface DatatableColumn {
   id: number,
-  value: string,
   title: string,
+  value: string,
   type: string,
   freeze?: boolean,
+  hidden?: boolean,
   align?: string
 }
 
-const datatableHead = ref<DatatableTh[]>([
-  { id: 0, value: 'id', title: 'Id', type: 'numeric', align: 'left', freeze: true, },
+const datatableHead = ref<DatatableColumn[]>([
+  { id: 0, value: 'id', title: 'Id', type: 'numeric', align: 'left', freeze: false, hidden: true },
   { id: 1, value: 'account', title: 'Account', type: 'text-short', align: 'left', freeze: false, },
   { id: 2, value: 'name', title: 'Name', type: 'text-short', align: 'left', freeze: false, },
   { id: 3, value: 'city', title: 'City', type: 'text-short', align: 'left', freeze: false, },
@@ -94,12 +84,13 @@ interface IColumnSize {
 }
 
 const rows = ref([1,2,3,4,5])
-const cols = ref<Columns[]>([
-  { id: 0, title: 'First name', value: 'John', type: 'text-short', align: 'left', freeze: true },
-  { id: 1, title: 'Last name', value: 'Johnson', type: 'text-short', align: 'left', freeze: false},
-  { id: 2, title: 'Email', value: 'john@johnson.com', type: 'text-short', align: 'left', freeze: false },
-  { id: 3, title: 'Address', value: '7850 Old Shore Drive', type: 'text-long', align: 'right', freeze: false },
-  { id: 4, title: 'Balance', value: '2000', type: 'numeric', align: 'center', freeze: false },
+const cols = ref<DatatableColumn[]>([
+  { id: 0, title: 'Id', value: '1', type: 'text-short', align: 'left', freeze: false },
+  { id: 1, title: 'First name', value: 'John', type: 'text-short', align: 'left', freeze: false },
+  { id: 2, title: 'Last name', value: 'Johnson', type: 'text-short', align: 'left', freeze: false},
+  { id: 3, title: 'Email', value: 'john@johnson.com', type: 'text-short', align: 'left', freeze: false },
+  { id: 4, title: 'Address', value: '7850 Old Shore Drive', type: 'text-long', align: 'right', freeze: false },
+  { id: 5, title: 'Balance', value: '2000', type: 'numeric', align: 'center', freeze: false },
 ])
 
 const thRefs = ref();
@@ -112,7 +103,7 @@ onMounted(() => {
   console.log('onMounted')
   thRefs.value = tableRef.value.querySelectorAll('th')
 
-  columns.value = cols.value.map((col: Columns, index) => (
+  columns.value = cols.value.map((col: DatatableColumn, index) => (
     {
       th: thRefs.value[index],
       size: `minmax(${min}px, ${columnTypeToRatioMap[col.type] + 'fr'})`
@@ -121,7 +112,7 @@ onMounted(() => {
   colAmount.value = columns.value.length
 })
 
-const freezeColumn = (col: Columns) => {
+const freezeColumn = (col: DatatableColumn) => {
   cols.value[col.id].freeze = !cols.value[col.id].freeze;
 }
 
@@ -185,11 +176,12 @@ table {
   position: relative;
   /* Initial values */
   grid-template-columns:
-    minmax(150px, 1fr)
-    minmax(150px, 1fr)
-    minmax(150px, 1fr)
-    minmax(150px, 1fr)
-    minmax(150px, 1fr);
+    minmax(100px, 1fr)
+    minmax(100px, 1fr)
+    minmax(100px, 1fr)
+    minmax(100px, 1fr)
+    minmax(100px, 1fr)
+    minmax(100px, 1fr);
 
   tr:last-of-type td {
     border-bottom: none;
@@ -233,6 +225,9 @@ tr:nth-of-type(odd) td {
     position: sticky;
     left: 0;
     z-index: 1;
+  }
+  &.hidden {
+
   }
 }
 </style>
